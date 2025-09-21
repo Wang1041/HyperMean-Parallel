@@ -357,32 +357,218 @@ XLWP_test <- function(sam1, sam2, eq.cov = TRUE, cov.same, cov1, cov2,
     
     # 内部函数：不等协方差情况下的检验
     xu2016_diffcov <- function(sam1, sam2, cov1, cov2, G_greek = c(1:6, Inf)) {
-      # 实现逻辑与等协方差情况类似，但分别处理两个协方差矩阵
-      # 由于篇幅限制，这里省略详细实现
-      # 实际代码中需要修改SPU_u_diff、var_diff_other等函数来处理两个不同的协方差矩阵
-      
       n1 <- nrow(sam1); n2 <- nrow(sam2); p <- ncol(sam1)
       x1_bar <- colMeans(sam1)
       x2_bar <- colMeans(sam2)
       diff <- x1_bar - x2_bar
       
+      # 确保包含无穷大γ值
       if(!is.element(Inf, G_greek)) {
         G_greek <- c(G_greek, Inf)
       }
       G_greek0 <- G_greek[G_greek != Inf]
       
-      # 后续实现与等协方差情况类似，但使用两个协方差矩阵
-      # ...
+      # 划分奇偶集合
+      odd.ga <- G_greek0[G_greek0 %% 2 == 1]
+      even.ga <- G_greek0[G_greek0 %% 2 == 0]
+      n.odd.ga <- length(odd.ga)
+      n.even.ga <- length(even.ga)
+      
+      # 计算统计量均值 - 不等协方差版本
+      SPU_u_diff <- function(n1, n2, gamma, cov1, cov2) {
+        if(gamma %% 2 == 0) {
+          gamma.half <- gamma / 2
+          u_i <- 0
+          for(d in 0:gamma.half) {
+            u_i <- u_i + 1 / (factorial(d) * factorial(gamma.half - d) * n1^d * n2^(gamma.half - d))
+          }
+          # 不等协方差：分别使用两个协方差矩阵的对角线元素
+          u <- (diag(cov1)^d) * (diag(cov2)^(gamma.half - d)) * factorial(gamma) * u_i / 2^gamma.half 
+        } else {
+          u <- 0  # 奇数γ的均值为0
+        }
+        return(u)
+      }
+      
+      # 方差的第三块计算 - 不等协方差版本
+      var_diff_other <- function(n1, n2, gamma, cov1, cov2) {
+        t <- gamma
+        s <- gamma
+        
+        # 提取对角元素并剔除对角元素
+        diag_cov1 <- diag(cov1)
+        diag_cov2 <- diag(cov2)
+        p <- length(diag_cov1)
+        
+        # 创建四个矩阵分别对应两个协方差矩阵的行列组合
+        mat1_cov1 <- matrix(rep(diag_cov1, p), p, p, byrow = FALSE)
+        mat2_cov1 <- matrix(rep(diag_cov1, p), p, p, byrow = TRUE)
+        mat1_cov2 <- matrix(rep(diag_cov2, p), p, p, byrow = FALSE)
+        mat2_cov2 <- matrix(rep(diag_cov2, p), p, p, byrow = TRUE)
+        
+        diag(cov1) <- diag(cov2) <- 0  # 剔除对角线
+        
+        P3 <- 0
+        for(c3 in 0:min(c(t, s))) {
+          for(d3 in 0:min(c(t - c3, s - c3))) {
+            if(c3 + d3 > 0) {
+              for(c1 in 0:floor((t - c3 - d3) / 2)) {
+                for(c2 in 0:floor((s - c3 - d3) / 2)) {
+                  if((t - 2*c1 - c3 - d3) %% 2 == 0 & (s - 2*c2 - c3 - d3) %% 2 == 0) {
+                    d1 <- (t - 2*c1 - c3 - d3) / 2
+                    d2 <- (s - 2*c2 - c3 - d3) / 2
+                    
+                    # 不等协方差：使用两个协方差矩阵的组合
+                    mat <- mat1_cov1^c1 * mat1_cov2^d1 * mat2_cov1^c2 * mat2_cov2^d2 * cov1^c3 * cov2^d3
+                    nume <- (factorial(gamma))^2 * sum(mat)
+                    deno <- (n1^(c1 + c2 + c3) * n2^(d1 + d2 + d3) * factorial(c1) * factorial(c2) *
+                             factorial(d1) * factorial(d2) * factorial(c3) * factorial(d3) * 2^(c1 + c2 + d1 + d2))
+                    P3 <- P3 + nume / deno
+                  }
+                }
+              }
+            }
+          }
+        }
+        return(P3)
+      }
+      
+      # 统计量的方差计算 - 不等协方差版本
+      SPU_var_diff <- function(n1, n2, gamma, cov1, cov2) {
+        p <- nrow(cov1)
+        if(gamma == 1) {
+          var <- sum(cov1)/n1 + sum(cov2)/n2  # 不等协方差的方差计算
+        } else {
+          P1 <- sum(SPU_u_diff(n1, n2, 2*gamma, cov1, cov2))
+          P2 <- sum((SPU_u_diff(n1, n2, gamma, cov1, cov2))^2)
+          P3 <- var_diff_other(n1, n2, gamma, cov1, cov2)
+          var <- P1 - P2 + P3
+        }
+        return(var)
+      }
+      
+      # 计算To和Te的值
+      T_O <- T_E <- 0
+      Var.ss <- numeric(length(G_greek0))
+      
+      for(i in G_greek0) {
+        Var_i <- SPU_var_diff(n1, n2, i, cov1, cov2)
+        Var.ss[i] <- Var_i
+        XLWP <- (sum(diff^i) - sum(SPU_u_diff(n1, n2, i, cov1, cov2))) / sqrt(Var_i)
+        
+        if(i %% 2 == 1) {
+          if(abs(XLWP) >= T_O) T_O <- abs(XLWP)
+        } else {
+          if(XLWP >= T_E) T_E <- XLWP
+        }
+      }
+      
+      # 计算不同gamma值之间的相关系数 - 不等协方差版本
+      cov_diff_other <- function(n1, n2, s, t, cov1, cov2) {
+        # 提取对角元素并剔除对角元素
+        diag_cov1 <- diag(cov1)
+        diag_cov2 <- diag(cov2)
+        p <- length(diag_cov1)
+        
+        # 创建四个矩阵分别对应两个协方差矩阵的行列组合
+        mat1_cov1 <- matrix(rep(diag_cov1, p), p, p, byrow = FALSE)
+        mat2_cov1 <- matrix(rep(diag_cov1, p), p, p, byrow = TRUE)
+        mat1_cov2 <- matrix(rep(diag_cov2, p), p, p, byrow = FALSE)
+        mat2_cov2 <- matrix(rep(diag_cov2, p), p, p, byrow = TRUE)
+        
+        diag(cov1) <- diag(cov2) <- 0  # 剔除对角线
+        
+        P3 <- 0
+        for(c3 in 0:min(c(t, s))) {
+          for(d3 in 0:min(c(t - c3, s - c3))) {
+            if(c3 + d3 > 0) {
+              for(c1 in 0:floor((t - c3 - d3) / 2)) {
+                for(c2 in 0:floor((s - c3 - d3) / 2)) {
+                  if((t - 2*c1 - c3 - d3) %% 2 == 0 & (s - 2*c2 - c3 - d3) %% 2 == 0) {
+                    d1 <- (t - 2*c1 - c3 - d3) / 2
+                    d2 <- (s - 2*c2 - c3 - d3) / 2
+                    
+                    # 不等协方差：使用两个协方差矩阵的组合
+                    mat <- mat1_cov1^c1 * mat1_cov2^d1 * mat2_cov1^c2 * mat2_cov2^d2 * cov1^c3 * cov2^d3
+                    nume <- factorial(s) * factorial(t) * sum(mat)
+                    deno <- (n1^(c1 + c2 + c3) * n2^(d1 + d2 + d3) * factorial(c1) * factorial(c2) *
+                             factorial(d1) * factorial(d2) * factorial(c3) * factorial(d3) * 2^(c1 + c2 + d1 + d2))
+                    P3 <- P3 + nume / deno
+                  }
+                }
+              }
+            }
+          }
+        }
+        return(P3)
+      }
+      
+      # 统计量的协方差计算 - 不等协方差版本
+      SPU_cov_diff <- function(n1, n2, s, t, cov1, cov2) {
+        p <- nrow(cov1)
+        P1 <- sum(SPU_u_diff(n1, n2, s + t, cov1, cov2))
+        P2 <- sum(SPU_u_diff(n1, n2, s, cov1, cov2) * SPU_u_diff(n1, n2, t, cov1, cov2))
+        P3 <- cov_diff_other(n1, n2, s, t, cov1, cov2)
+        cov <- P1 - P2 + P3
+        return(cov)
+      }
+      
+      # 计算RO、RE
+      R_E <- matrix(0, n.even.ga, n.even.ga)
+      R_O <- matrix(0, n.odd.ga, n.odd.ga)
+      
+      for(s in odd.ga) {
+        for(t in odd.ga) {
+          if(s < t) {
+            io <- which(odd.ga == s)
+            jo <- which(odd.ga == t)
+            i <- which(G_greek0 == s)
+            j <- which(G_greek0 == t)
+            R_O[io, jo] <- SPU_cov_diff(n1, n2, s, t, cov1, cov2) / sqrt(Var.ss[i] * Var.ss[j])
+          }
+        }
+      }
+      
+      for(s in even.ga) {
+        for(t in even.ga) {
+          if(s < t) {
+            ie <- which(even.ga == s)
+            je <- which(even.ga == t)
+            i <- which(G_greek0 == s)
+            j <- which(G_greek0 == t)
+            R_E[ie, je] <- SPU_cov_diff(n1, n2, s, t, cov1, cov2) / sqrt(Var.ss[i] * Var.ss[j])
+          }
+        }
+      }
+      
+      # 对称化相关矩阵
+      R_O <- R_O + t(R_O)
+      diag(R_O) <- 1
+      R_E <- R_E + t(R_E)
+      diag(R_E) <- 1
+      
+      # 计算奇偶集合的P值
+      pval_O <- 1 - pmvnorm(lower = -rep(T_O, n.odd.ga), upper = rep(T_O, n.odd.ga),
+                            mean = rep(0, n.odd.ga), sigma = R_O)
+      
+      pval_E <- 1 - pmvnorm(lower = rep(-Inf, n.even.ga), upper = rep(T_E, n.even.ga),
+                            mean = rep(0, n.even.ga), sigma = R_E)
+      
+      # 计算gamma为∞的情况（Cai et al. 2014）- 不等协方差版本
+      nume <- diff^2
+      deno <- diag(cov1)/n1 + diag(cov2)/n2  # 不等协方差的方差估计
+      deno[deno <= 1e-10] <- 1e-10
+      
+      T_CLX <- max(nume / deno)
+      M <- T_CLX - 2 * log(p) + log(log(p)) + log(pi)
+      pval_inf <- 1 - exp(-exp(-M / 2))
+      
+      # 计算最终的p值
+      pval.min <- min(c(pval_O, pval_E, pval_inf))
+      pval <- 1 - (1 - pval.min)^3
       
       return(list(P_value = pval))
     }
-    
-    # 执行不等协方差检验
-    out <- xu2016_diffcov(sam1, sam2, cov1, cov2, G_greek)
-    out$time <- Sys.time() - start
-    return(out)
-  }
 }
 
-XLWP_test(sam1,sam2,T)
-XLWP_test(sam1,sam2,F)
+
