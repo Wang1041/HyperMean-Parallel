@@ -1,4 +1,8 @@
 SD_test <- function(sam1, sam2) {
+  # Srivastava & Du (2008) 高维两样本均值检验
+  # 输入：
+  #   sam1, sam2 - 样本矩阵（行=观测值，列=变量）
+  
   # 记录函数开始执行时间
   start_time <- Sys.time()
   
@@ -45,4 +49,5 @@ SD_test <- function(sam1, sam2) {
     computation_time = computation_time
   ))
 }
-SD_test(sam1,sam2)
+
+
