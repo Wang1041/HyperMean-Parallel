@@ -1,7 +1,7 @@
 XLWP_test <- function(sam1, sam2, eq.cov = TRUE, cov.same, cov1, cov2, 
                    G_greek = c(1:6, Inf), bandwidth, bandwidth1, bandwidth2, 
                    cv.fold = 5, norm = "F") {
-  # Xu et al.(2016) 高维两样本均值检验
+  # Xu & Lin & Wei & Pan (2016) 高维两样本均值检验
   # 结合SPU检验统计量与极值统计量
   # 输入参数：
   #   sam1, sam2: 样本矩阵（行=观测，列=变量）
@@ -570,5 +570,6 @@ XLWP_test <- function(sam1, sam2, eq.cov = TRUE, cov.same, cov1, cov2,
       return(list(P_value = pval))
     }
 }
+
 
 
