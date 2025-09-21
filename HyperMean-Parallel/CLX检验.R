@@ -1,5 +1,5 @@
 CLX_test <- function(sam1, sam2) {
-  # Cai et al.(2014)的高维两样本均值检验
+  # Cai & Liu & Xia (2014)的高维两样本均值检验
   # 输入：sam1和sam2为两个样本数据矩阵（行是观测，列是变量）
   # 输出：包含p值和计算时间的列表
   
@@ -34,3 +34,4 @@ CLX_test <- function(sam1, sam2) {
   return(out)
 }
 CLX_test(sam1,sam2)
+
