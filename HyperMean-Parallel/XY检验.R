@@ -1,5 +1,5 @@
 XY_test <- function(sam1, sam2, N = 1000) {
-  # Xue et al.(2020) 高维两样本均值检验
+  # Xue & Yao (2020) 高维两样本均值检验
   # 使用自助法（Bootstrap）计算p值
   # 输入：
   #   sam1, sam2 - 样本矩阵（行=观测值，列=变量）
@@ -44,3 +44,4 @@ XY_test <- function(sam1, sam2, N = 1000) {
   return(out)
 }
 XY_test(sam1,sam2)
+
