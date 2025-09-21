@@ -1,5 +1,5 @@
 HLWP_test <- function(sam1, sam2) {
-  # He et al.(2021) 高维两样本检验方法
+  # He & Xu & Wu & Pan (2021) 高维两样本检验方法
   # 结合有限范数统计量与极值统计量
   # 输入：sam1, sam2 - 样本矩阵（行=观测值，列=变量）
   
@@ -124,3 +124,4 @@ HLWP_test <- function(sam1, sam2) {
   return(out)
 }
 HLWP_test(sam1,sam2)
+
