@@ -1,5 +1,7 @@
 CQ_test<- function(sam1, sam2) {
-  # Chen et al.(2010)的高维两样本检验
+  # Chen & Qin (2010)的高维两样本检验
+  # 输入：
+  #   sam1, sam2 - 样本矩阵（行=观测值，列=变量）
   start_time <- Sys.time()
   
   # 基本样本信息
@@ -76,3 +78,4 @@ CQ_test<- function(sam1, sam2) {
        computation_time = Sys.time() - start_time)
 }
 CQ_test(sam1,sam2)
+
