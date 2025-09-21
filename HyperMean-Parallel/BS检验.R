@@ -41,5 +41,6 @@ BS_test<- function(sam1, sam2) {
     computation_time = Sys.time() - start_time  # 计算耗时
   ))
 }
-BS_test(sam1,sam2)
+
+
 
