@@ -486,5 +486,5 @@ XLWP_parallel_else <- function(sam1, sam2, eq.cov = TRUE, G_greek = c(1:6, Inf),
   # 关闭并行环境
   stopCluster(cl)
 }
-XLWP_parallel_else(sam1,sam2,T)
-XLWP_parallel_else(sam1,sam2,F)
+
+
