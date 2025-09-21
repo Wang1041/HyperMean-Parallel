@@ -1,4 +1,8 @@
 BS_test<- function(sam1, sam2) {
+  # Bai & Saranadasa (1996) 高维两样本均值检验
+  # 输入：
+  #   sam1, sam2 - 样本矩阵（行=观测值，列=变量）
+
   # 记录函数开始执行时间（用于性能监控）
   start_time <- Sys.time()
   
@@ -12,7 +16,7 @@ BS_test<- function(sam1, sam2) {
   mean_sam2 <- colMeans(sam2)  # 第二组样本的均值向量
   mean_difference <- mean_sam1 - mean_sam2  # 组间均值差异向量
   
-  # 计算关键统计量
+  # 检验统计量计算
   scaling_factor <- (n1 * n2) / (n1 + n2)  # 标准化的缩放因子
   squared_norm_diff <- sum(mean_difference^2)  # 均值差异向量的L2范数平方
   
@@ -38,3 +42,4 @@ BS_test<- function(sam1, sam2) {
   ))
 }
 BS_test(sam1,sam2)
+
