@@ -49,19 +49,19 @@ CLZ_parallel_else <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=avai
       # 合并方差估计
       diag.cov <- ((colSums(sam1_part^2) - n1*colMeans(sam1_part)^2 + 
                       (colSums(sam2_part^2) - n2*colMeans(sam2_part)^2))) / (n1 + n2 - 2)
-     diag.cov[diag.cov <= 1e-10] <- 1e-10  # 数值稳定
+      diag.cov[diag.cov <= 1e-10] <- 1e-10  # 数值稳定
                    
-                   # 计算标准化统计量
-                   T_orig <- (colMeans(sam1_part) - colMeans(sam2_part))^2 / 
-                     ((1/n1 + 1/n2)*diag.cov*2*log(p))
+      # 计算标准化统计量
+      T_orig <- (colMeans(sam1_part) - colMeans(sam2_part))^2 / 
+                ((1/n1 + 1/n2)*diag.cov*2*log(p))
                    
-                   # 阈值筛选
-                   s_level <- T_orig[T_orig > 0 & T_orig <= (1 - eta)]
+      # 阈值筛选
+      s_level <- T_orig[T_orig > 0 & T_orig <= (1 - eta)]
                    
-                   # 对齐输出长度（便于合并结果）
-                   max_len <- ncol(sam1_part)
-                   list(T_orig = T_orig,
-                        s_level = c(s_level, rep(0, max_len - length(s_level))))
+      # 对齐输出长度（便于合并结果）
+      max_len <- ncol(sam1_part)
+      list(T_orig = T_orig,
+            s_level = c(s_level, rep(0, max_len - length(s_level))))
     }
     
   } else {  # 不等协方差情况
@@ -110,5 +110,3 @@ CLZ_parallel_else <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=avai
   list(P值 = pval,
        time = Sys.time() - start)
 }
-
-CLZ_parallel_else(sam1,sam2)
