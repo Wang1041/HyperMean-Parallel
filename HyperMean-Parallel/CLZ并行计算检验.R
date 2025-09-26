@@ -1,4 +1,4 @@
-CLZ_parallel_else <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=availableCores() - 1) {
+CLZ_parallel_test <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=availableCores() - 1) {
   # Chen et al.(2014)的并行高维两样本检验
   # eq.cov: 是否假设协方差矩阵相等
   # eta: 阈值参数，默认0.05
@@ -110,3 +110,4 @@ CLZ_parallel_else <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=avai
   list(P值 = pval,
        time = Sys.time() - start)
 }
+
