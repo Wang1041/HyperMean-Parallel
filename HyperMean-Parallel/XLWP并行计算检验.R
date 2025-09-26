@@ -1,4 +1,4 @@
-XLWP_parallel_else <- function(sam1, sam2, eq.cov = TRUE, G_greek = c(1:6, Inf), 
+XLWP_parallel_test <- function(sam1, sam2, eq.cov = TRUE, G_greek = c(1:6, Inf), 
                                  num_cores=availableCores() - 1, cv.fold = 5, norm = "F", 
                                  cov.same, cov1, cov2, bandwidth, bandwidth1, bandwidth2) {
   # Xu et al.(2016) 并行高维两样本检验
@@ -486,5 +486,6 @@ XLWP_parallel_else <- function(sam1, sam2, eq.cov = TRUE, G_greek = c(1:6, Inf),
   # 关闭并行环境
   stopCluster(cl)
 }
+
 
 
