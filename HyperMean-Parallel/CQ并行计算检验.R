@@ -93,15 +93,11 @@ CQ_parallel_else <- function(sam1, sam2, num_cores) {
   deno <- 2 / (n1 * (n1 - 1)) * trSigma1_square + 
     2 / (n2 * (n2 - 1)) * trSigma2_square + 
     4 / (n1 * n2) * tr_Sigma1_Sigma2
-   # 关闭并行环境
-  stopCluster(cl)
   # 返回结果列表
   list(
     p值 = pnorm(-nume / sqrt(deno)),  # 正态近似p值
     time = Sys.time() - start         # 总计算时间
   )
- 
+    # 关闭并行环境
+  stopCluster(cl)
 }
-
-CQ_parallel_else(sam1,sam2,1)
-
