@@ -87,7 +87,9 @@ CLZ_parallel_test <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=avai
            s_level = c(s_level, rep(0, max_len - length(s_level))))
     }
   }
-  
+  if(is.matrix( result_s_level)==F){
+   result_s_level<-t(as.matrix(result_s_level))
+ }
   # ========== 3. 合并并行结果 ==========
   # 提取并合并所有块的T_orig和s_level
   T_orig_all <- unlist(lapply(result_s_level[,1], function(x) x))
@@ -110,4 +112,5 @@ CLZ_parallel_test <- function(sam1, sam2, eq.cov = F, eta = 0.05, num_cores=avai
   list(P值 = pval,
        time = Sys.time() - start)
 }
+
 
