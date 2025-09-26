@@ -1,4 +1,4 @@
-CQ_parallel_else <- function(sam1, sam2, num_cores) {
+CQ_parallel_test <- function(sam1, sam2, num_cores) {
   # 设置并行运算环境
   cl <- makeCluster(num_cores)
   registerDoParallel(cl)
@@ -101,3 +101,4 @@ CQ_parallel_else <- function(sam1, sam2, num_cores) {
     # 关闭并行环境
   stopCluster(cl)
 }
+
