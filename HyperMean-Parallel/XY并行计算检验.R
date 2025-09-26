@@ -56,4 +56,5 @@ XY_parallel_else  <- function(sam1, sam2, N = 1000,num_cores=availableCores() - 
   stopCluster(cl)
   return(out)
 }
-XY_parallel_else(sam1,sam2)
+
+
