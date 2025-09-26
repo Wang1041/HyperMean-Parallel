@@ -73,4 +73,3 @@ CLX_parallel_test <- function(sam1, sam2, num_cores=availableCores() - 1) {
   
   return(out)
 }
-CLX_parallel_test (sam1,sam2,3)
