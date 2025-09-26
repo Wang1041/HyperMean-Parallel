@@ -122,11 +122,10 @@ SD_parallel_test <- function(sam1, sam2, num_cores = availableCores() - 1) {
   
   # ======================== 整理结果并关闭集群 ========================
   computation_time <- Sys.time() - start_time
-  stopCluster(cl)
-  
   return(list(
     p_value = p_value,  
     computation_time = computation_time
   ))
+     # 关闭并行环境
+  stopCluster(cl)
 }
-SD_parallel_test(sam1,sam2,2)
