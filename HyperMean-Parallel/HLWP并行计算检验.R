@@ -1,6 +1,4 @@
-
-
-HLWP_parallel_else  <- function(sam1, sam2, num_cores=availableCores() - 1) {
+HXWP_parallel_test  <- function(sam1, sam2, num_cores=availableCores() - 1) {
   # He et al.(2021) 并行高维两样本检验
   # 使用并行计算加速统计量计算
   # 输入：sam1, sam2 - 样本矩阵，num_cores - 并行核心数
@@ -158,4 +156,5 @@ HLWP_parallel_else  <- function(sam1, sam2, num_cores=availableCores() - 1) {
   stopCluster(cl)
   return(out)
 }
+
 
