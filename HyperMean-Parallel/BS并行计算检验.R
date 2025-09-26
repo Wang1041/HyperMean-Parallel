@@ -102,10 +102,11 @@ BS_parallel_test <- function(sam1, sam2, num_cores=availableCores() - 1) {
   # 返回结果
   return(list(
     p_value = p_value,
-    computation_time = computation_time
+    time = computation_time
   ))
   
   # 关闭并行环境
   stopCluster(cl)
 }
+
 
