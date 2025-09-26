@@ -1,4 +1,4 @@
-XY_parallel_else  <- function(sam1, sam2, N = 1000,num_cores=availableCores() - 1) {
+XY_parallel_test  <- function(sam1, sam2, N = 1000,num_cores=availableCores() - 1) {
   # Xue et al.(2020) 并行高维两样本均值检验
   # 使用并行Bootstrap方法计算p值
   # 输入：
@@ -56,5 +56,6 @@ XY_parallel_else  <- function(sam1, sam2, N = 1000,num_cores=availableCores() - 
   stopCluster(cl)
   return(out)
 }
+
 
 
